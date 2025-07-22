@@ -1,0 +1,8 @@
+module.exports = {
+    partial: true,
+    configuration: {
+        enable: [
+            "FILAMENT_RUNOUT_SENSOR"
+        ]
+    }
+};
