@@ -1,0 +1,14 @@
+name: marlin_auto_build
+
+on:
+  push:
+    paths:
+      - 'builds/**'
+  schedule:
+    - cron:  '33 3 * * *'
+
+jobs:
+  create_builds:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: zisismaras/marlin_auto_build@master
