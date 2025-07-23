@@ -7,7 +7,13 @@ module.exports = {
     },
     configuration: {
         enable: [
-            ["GRID_MAX_POINTS_X", 5]
+            ["GRID_MAX_POINTS_X", 5],
+            "FILAMENT_RUNOUT_SENSOR"
+        ]
+    },
+    configuration_adv: {
+        enable: [
+            "ADVANCED_PAUSE_FEATURE"
         ]
     }
 };
