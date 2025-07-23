@@ -8,7 +8,8 @@ module.exports = {
     configuration: {
         enable: [
             ["GRID_MAX_POINTS_X", 5],
-            "FILAMENT_RUNOUT_SENSOR"
+            "NOZZLE_PARK_FEATURE",
+            "FILAMENT_RUNOUT_SENSOR",
         ]
     },
     configuration_adv: {
