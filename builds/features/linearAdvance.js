@@ -3,9 +3,9 @@ module.exports = {
     configuration_adv: {
         enable: [
             "LIN_ADVANCE",
-            ["LIN_ADVANCE_K", 0],
-            "S_CURVE_ACCELERATION",
-            "ALLOW_LOW_EJERK"
+            ["LIN_ADVANCE_K", 0]
+            //"S_CURVE_ACCELERATION",
+            //"ALLOW_LOW_EJERK"
         ]
     }
 };
