@@ -4,7 +4,7 @@ module.exports = {
         enable: [
             "LIN_ADVANCE",
             ["LIN_ADVANCE_K", 0],
-            "EXPERIMENTAL_SCURVE",
+            "S_CURVE_ACCELERATION",
             "ALLOW_LOW_EJERK"
         ]
     }
