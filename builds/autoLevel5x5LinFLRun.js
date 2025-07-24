@@ -11,7 +11,7 @@ module.exports = {
             "PIDTEMPBED",
             "NOZZLE_PARK_FEATURE",
             "FILAMENT_RUNOUT_SENSOR",
-            ["FIL_RUNOUT_STATE", "HIGH"]
+            ["FIL_RUNOUT_STATE", HIGH]
         ]
     },
     configuration_adv: {
