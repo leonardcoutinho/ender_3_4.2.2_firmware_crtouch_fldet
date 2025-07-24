@@ -3,8 +3,8 @@ module.exports = {
     configuration_adv: {
         enable: [
             "LIN_ADVANCE",
-            ["LIN_ADVANCE_K", 0]
-            //"S_CURVE_ACCELERATION",
+            ["ADVANCE_K", 0.22]
+            //"S_CURVE_ACCELERATION" was default enabled for Ender 3 4.2.2,
             //"ALLOW_LOW_EJERK"
         ]
     }
