@@ -1,14 +1,10 @@
 module.exports = {
     partial: true,
-    configuration: {
-        enable: [
-            "FILAMENT_RUNOUT_SENSOR",
-            ["FIL_RUNOUT_STATE", q`HIGH`]
-        ]
-    },
     configuration_adv: {
         enable: [
-            "ADVANCED_PAUSE_FEATURE"
+            "INPUT_SHAPING_X",
+            "INPUT_SHAPING_Y",
+            "SHAPING_MENU"
         ]
     }
 };
