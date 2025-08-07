@@ -5,8 +5,8 @@ module.exports = {
         "builds/features/fl_detect.js"
     ],
     meta: {
-        stable_name: "ender_3_4.2.2-{{marlin_version}}-auto_level_5x5_lin-{{uid}}",
-        nightly_name: "ender_3_4.2.2-{{current_date}}-auto_level_5x5_lin-{{uid}}"
+        stable_name: "ender_3_4.2.2-{{marlin_version}}-autoLevel5x5LinFLRun-{{uid}}",
+        nightly_name: "ender_3_4.2.2-{{current_date}}-autoLevel5x5LinFLRun-{{uid}}"
     },
     configuration: {
         enable: [
