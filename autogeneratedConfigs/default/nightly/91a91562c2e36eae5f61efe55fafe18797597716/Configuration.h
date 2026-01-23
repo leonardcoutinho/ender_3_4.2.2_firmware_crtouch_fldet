@@ -63,7 +63,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(Dust, valerionew, Ender-3, zisismaras)" //ORIGINAL: #define STRING_CONFIG_H_AUTHOR "(Dust, valerionew, Ender-3)" // Original author or contributor.
+#define STRING_CONFIG_H_AUTHOR "(Dust, valerionew, Ender-3)" // Original author or contributor.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 // @section machine
@@ -124,6 +124,13 @@
 #ifdef RS485_SERIAL_PORT
   //#define M485_PROTOCOL 1   // Check your host for protocol compatibility
   //#define RS485_BUS_BUFFER_SIZE 128
+#endif
+
+// Enable CAN bus support and protocol
+//#define CAN_HOST
+//#define CAN_TOOLHEAD
+#if ANY(CAN_HOST, CAN_TOOLHEAD)
+  //#define CAN_DEBUG
 #endif
 
 // Enable the Bluetooth serial interface on AT90USB devices
@@ -308,6 +315,18 @@
 #endif
 
 /**
+ * Differential Extruder
+ *
+ * The X and E steppers work together to create a differential drive system.
+ * Simple  : E steps = X + E   ; X steps = X  (E drives a loop, X stays the same)
+ * Balanced: E steps = X + E/2 ; X steps = X - E/2  (Dual loop system)
+ */
+//#define DIFFERENTIAL_EXTRUDER
+#if ENABLED(DIFFERENTIAL_EXTRUDER)
+  //#define BALANCED_DIFFERENTIAL_EXTRUDER
+#endif
+
+/**
  * Switching Toolhead
  *
  * Support for swappable and dockable toolheads, such as
@@ -458,7 +477,7 @@
 //===========================================================================
 //============================= Thermal Settings ============================
 //===========================================================================
-// @section temperature
+// @section temperature sensors
 
 /**
  * Temperature Sensors:
@@ -490,7 +509,7 @@
  *    10 : 100kΩ RS PRO 198-961
  *    11 : 100kΩ Keenovo AC silicone mats, most Wanhao i3 machines - beta 3950, 1%
  *    12 : 100kΩ Vishay 0603 SMD NTCS0603E3104FXT (#8) - calibrated for Makibox hot bed
- *    13 : 100kΩ Hisens up to 300°C - for "Simple ONE" & "All In ONE" hotend - beta 3950, 1%
+ *    13 : 100kΩ Hisense up to 300°C - for "Simple ONE" & "All In ONE" hotend - beta 3950, 1%
  *    14 : 100kΩ  (R25), 4092K (beta25), 4.7kΩ pull-up, bed thermistor as used in Ender-5 S1
  *    15 : 100kΩ Calibrated for JGAurora A5 hotend
  *    17 : 100kΩ Dagoma NTC white thermistor
@@ -552,6 +571,7 @@
  * ================================================================
  *  Analog Thermocouple Boards
  * ================================================================
+ *   -18 : ADS1118 with Thermocouple, e.g., Mightyboard rev G/H
  *    -4 : AD8495 with Thermocouple
  *    -1 : AD595  with Thermocouple
  *
@@ -642,6 +662,8 @@
   #define TEMP_SENSOR_REDUNDANT_MAX_DIFF  10  // (°C) Temperature difference that will trigger a print abort.
 #endif
 
+// @section temperature
+
 // Below this temperature the heater will be switched off
 // because it probably indicates a broken thermistor wire.
 #define HEATER_0_MINTEMP   5
@@ -709,13 +731,13 @@
   #if ENABLED(PID_PARAMS_PER_HOTEND)
     // Specify up to one value per hotend here, according to your setup.
     // If there are fewer values, the last one applies to the remaining hotends.
-    #define DEFAULT_Kp_LIST {  21.73,  21.73 }
-    #define DEFAULT_Ki_LIST {   1.54,   1.54 }
-    #define DEFAULT_Kd_LIST {  76.55,  76.55 }
+    #define DEFAULT_KP_LIST {  21.73,  21.73 }
+    #define DEFAULT_KI_LIST {   1.54,   1.54 }
+    #define DEFAULT_KD_LIST {  76.55,  76.55 }
   #else
-    #define DEFAULT_Kp  21.73
-    #define DEFAULT_Ki   1.54
-    #define DEFAULT_Kd  76.55
+    #define DEFAULT_KP  21.73
+    #define DEFAULT_KI   1.54
+    #define DEFAULT_KD  76.55
   #endif
 #else
   #define BANG_MAX 255    // Limit hotend current while in bang-bang mode; 255=full current
@@ -804,7 +826,7 @@
  *
  * With this option disabled, bang-bang will be used. BED_LIMIT_SWITCHING enables hysteresis.
  */
-#define PIDTEMPBED //ORIGINAL: //#define PIDTEMPBED
+//#define PIDTEMPBED
 
 #if ENABLED(PIDTEMPBED)
   //#define MIN_BED_POWER 0   // Min power to improve PID stability (0..MAX_BED_POWER).
@@ -813,15 +835,15 @@
 
   // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  #define DEFAULT_bedKp  10.00
-  #define DEFAULT_bedKi   0.023
-  #define DEFAULT_bedKd 305.4
+  #define DEFAULT_BED_KP  10.00
+  #define DEFAULT_BED_KI   0.023
+  #define DEFAULT_BED_KD 305.4
 
   // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   // from pidautotune
-  //#define DEFAULT_bedKp   97.1
-  //#define DEFAULT_bedKi    1.41
-  //#define DEFAULT_bedKd 1675.16
+  //#define DEFAULT_BED_KP   97.1
+  //#define DEFAULT_BED_KI    1.41
+  //#define DEFAULT_BED_KD 1675.16
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #else
@@ -902,9 +924,9 @@
 
   // Lasko "MyHeat Personal Heater" (200w) modified with a Fotek SSR-10DA to control only the heating element
   // and placed inside the small Creality printer enclosure tent.
-  #define DEFAULT_chamberKp  37.04
-  #define DEFAULT_chamberKi   1.40
-  #define DEFAULT_chamberKd 655.17
+  #define DEFAULT_CHAMBER_KP  37.04
+  #define DEFAULT_CHAMBER_KI   1.40
+  #define DEFAULT_CHAMBER_KD 655.17
   // M309 P37.04 I1.04 D655.17
 
   // FIND YOUR OWN: "M303 E-2 C8 S50" to run autotune on the chamber at 50 degreesC for 8 cycles.
@@ -951,7 +973,7 @@
  * protect against a broken or disconnected thermistor wire.
  *
  * The issue: If a thermistor falls out, it will report the much lower
- * temperature of the air in the room, and the the firmware will keep
+ * temperature of the air in the room, and the firmware will keep
  * the heater on.
  *
  * If you get "Thermal Runaway" or "Heating failed" errors the
@@ -1062,7 +1084,8 @@
   // Delta radius and diagonal rod adjustments
   //#define DELTA_RADIUS_TRIM_TOWER       { 0.0, 0.0, 0.0 } // (mm)
   //#define DELTA_DIAGONAL_ROD_TRIM_TOWER { 0.0, 0.0, 0.0 } // (mm)
-#endif
+
+#endif // DELTA
 
 // @section scara
 
@@ -1118,17 +1141,37 @@
   #define TPARA_LINKAGE_1 120     // (mm)
   #define TPARA_LINKAGE_2 120     // (mm)
 
-  // TPARA tower offset (position of Tower relative to bed zero position)
+  // Height of the Shoulder axis (pivot) relative to the tower floor
+  #define TPARA_SHOULDER_AXIS_HEIGHT 135.0     // (mm)
+
+  // The position of the last linkage relative to the robot arm origin
+  // (intersection of the base axis and floor) when at the home position
+  #define TPARA_ARM_X_HOME_POS  28.75  // (mm) Measured from shoulder axis to tool holder axis in home position
+  #define TPARA_ARM_Y_HOME_POS   0     // (mm)
+  #define TPARA_ARM_Z_HOME_POS 250.00  // (mm) Measured from tool holder axis to the floor
+
+  // TPARA Workspace offset relative to the tower (position of workspace origin relative to robot Tower origin )
   // This needs to be reasonably accurate as it defines the printbed position in the TPARA space.
-  #define TPARA_OFFSET_X    0     // (mm)
-  #define TPARA_OFFSET_Y    0     // (mm)
-  #define TPARA_OFFSET_Z    0     // (mm)
+  #define TPARA_OFFSET_X    127.0     // (mm) to coincide with minimum radius MIDDLE_DEAD_ZONE_R, and W(0,0,0) is reachable
+  #define TPARA_OFFSET_Y      0.0     // (mm)
+  #define TPARA_OFFSET_Z      0.0     // (mm)
+
+  // TPARA tool connection point offset, relative to the tool moving frame origin which is in the last linkage axis,
+  // (TCP: tool center/connection point) of the robot,
+  // the plane of measured offset must be alligned with home position plane
+  #define TPARA_TCP_OFFSET_X    27.0     // (mm) Tool flange: 27 (distance from pivot to bolt holes), extruder tool: 50.0,
+  #define TPARA_TCP_OFFSET_Y     0.0     // (mm)
+  #define TPARA_TCP_OFFSET_Z   -65.0     // (mm) Tool flange (bottom): -6 (caution as Z 0 posiion will crash second linkage to the floor, -35 is safe for testing with no tool), extruder tool (depends on extruder): -65.0
 
   #define FEEDRATE_SCALING        // Convert XY feedrate from mm/s to degrees/s on the fly
 
   // Radius around the center where the arm cannot reach
-  #define MIDDLE_DEAD_ZONE_R   0  // (mm)
-#endif
+  // For now use a hardcoded uniform limit, although it should be calculated, or fix a limit for each axis angle
+  #define MIDDLE_DEAD_ZONE_R   100    // (mm)
+
+  // Max angle between L1 and L2
+  #define TPARA_MAX_L1L2_ANGLE 140.0f // (degrees)
+#endif // AXEL_TPARA
 
 // @section polar
 
@@ -1404,6 +1447,11 @@
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
 #define S_CURVE_ACCELERATION
+#if ENABLED(S_CURVE_ACCELERATION)
+  // Define to use 4th instead of 6th order motion curve
+  //#define S_CURVE_FACTOR 0.25    // Initial and final acceleration factor, ideally 0.1 to 0.4.
+                                   // Shouldn't generally require tuning.
+#endif
 
 //===========================================================================
 //============================= Z Probe Options =============================
@@ -1419,10 +1467,10 @@
  * The probe replaces the Z-MIN endstop and is used for Z homing.
  * (Automatically enables USE_PROBE_FOR_Z_HOMING.)
  */
-// #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN //ORIGINAL: #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
+#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 
 // Force the use of the probe for Z-axis homing
-#define USE_PROBE_FOR_Z_HOMING //ORIGINAL: //#define USE_PROBE_FOR_Z_HOMING
+//#define USE_PROBE_FOR_Z_HOMING
 
 /**
  * Z_MIN_PROBE_PIN
@@ -1437,7 +1485,7 @@
  *    - Normally-closed (NC) also connect to GND.
  *    - Normally-open (NO) also connect to 5V.
  */
-#define Z_MIN_PROBE_PIN PB1 //ORIGINAL: //#define Z_MIN_PROBE_PIN -1
+//#define Z_MIN_PROBE_PIN -1
 
 /**
  * Probe Type
@@ -1479,7 +1527,7 @@
 /**
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
  */
-#define BLTOUCH //ORIGINAL: //#define BLTOUCH
+//#define BLTOUCH
 
 /**
  * MagLev V4 probe by MDD
@@ -1632,7 +1680,7 @@
  * Nozzle-to-Probe offsets { X, Y, Z }
  *
  * X and Y offset
- *   Use a caliper or ruler to measure the distance from the tip of
+ *   Use a caliper or ruler to measure the distance (in mm) from the tip of
  *   the Nozzle to the center-point of the Probe in the X and Y axes.
  *
  * Z offset
@@ -1668,13 +1716,15 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { -50, -10, -0.9 } //ORIGINAL: #define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 } // (mm) X, Y, Z distance from Nozzle tip to Probe trigger-point
 
 // Enable and set to use a specific tool for probing. Disable to allow any tool.
 #define PROBING_TOOL 0
 #ifdef PROBING_TOOL
   //#define PROBE_TOOLCHANGE_NO_MOVE  // Suppress motion on probe tool-change
 #endif
+
+//#define PROBE_WAKEUP_TIME_MS  30    // (ms) Time for the probe to wake up
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1770,7 +1820,7 @@
 //#define PROBE_OFFSET_ZMAX  20   // (mm)
 
 // Enable the M48 repeatability test to test probe accuracy
-#define Z_MIN_PROBE_REPEATABILITY_TEST //ORIGINAL: //#define Z_MIN_PROBE_REPEATABILITY_TEST
+//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
@@ -1829,15 +1879,12 @@
 //#define DISABLE_V
 //#define DISABLE_W
 
-// Turn off the display blinking that warns about possible accuracy reduction
-//#define DISABLE_REDUCED_ACCURACY_WARNING
-
 // @section extruder
 
 //#define DISABLE_E               // Disable the extruder when not stepping
 //#define DISABLE_OTHER_EXTRUDERS // Keep only the active extruder enabled
 
-// @section motion
+// @section stepper drivers
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR false
@@ -1849,8 +1896,6 @@
 //#define INVERT_U_DIR false
 //#define INVERT_V_DIR false
 //#define INVERT_W_DIR false
-
-// @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
 #define INVERT_E0_DIR false
@@ -1991,12 +2036,12 @@
  * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
  */
-#define FILAMENT_RUNOUT_SENSOR //ORIGINAL: //#define FILAMENT_RUNOUT_SENSOR
+//#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
   #define FIL_RUNOUT_ENABLED_DEFAULT true // Enable the sensor on startup. Override with M412 followed by M500.
   #define NUM_RUNOUT_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
 
-  #define FIL_RUNOUT_STATE HIGH //ORIGINAL:   #define FIL_RUNOUT_STATE     LOW        // Pin state indicating that filament is NOT present.
+  #define FIL_RUNOUT_STATE     LOW        // Pin state indicating that filament is NOT present.
   #define FIL_RUNOUT_PULLUP               // Use internal pullup for filament runout pins.
   //#define FIL_RUNOUT_PULLDOWN           // Use internal pulldown for filament runout pins.
   //#define WATCH_ALL_RUNOUT_SENSORS      // Execute runout script on any triggering sensor, not only for the active extruder.
@@ -2137,7 +2182,7 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR //ORIGINAL: //#define AUTO_BED_LEVELING_BILINEAR
+//#define AUTO_BED_LEVELING_BILINEAR
 //#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
@@ -2190,8 +2235,14 @@
    */
   #define ENABLE_LEVELING_FADE_HEIGHT
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    #define DEFAULT_LEVELING_FADE_HEIGHT 20 //ORIGINAL:     #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
+    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
   #endif
+
+  /**
+   * Add Z offset (M424 Z) that applies to all moves at the planner level.
+   * This Z offset will be automatically set to the middle value with G29.
+   */
+  //#define GLOBAL_MESH_Z_OFFSET
 
   /**
    * For Cartesian machines, instead of dividing moves on mesh boundaries,
@@ -2220,7 +2271,7 @@
 #if ANY(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 5 //ORIGINAL:   #define GRID_MAX_POINTS_X 3
+  #define GRID_MAX_POINTS_X 3
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column
@@ -2253,7 +2304,7 @@
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
   #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed
-  #define GRID_MAX_POINTS_X 5 //ORIGINAL:   #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
+  #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   //#define UBL_HILBERT_CURVE       // Use Hilbert distribution for less travel when probing multiple points
@@ -2295,7 +2346,7 @@
   //===========================================================================
 
   #define MESH_INSET 10          // Set Mesh bounds as an inset region of the bed
-  #define GRID_MAX_POINTS_X 5 //ORIGINAL:   #define GRID_MAX_POINTS_X 3
+  #define GRID_MAX_POINTS_X 3
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS
@@ -2306,7 +2357,7 @@
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
-#define LCD_BED_LEVELING //ORIGINAL: //#define LCD_BED_LEVELING
+//#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
@@ -2315,13 +2366,13 @@
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
-#define LCD_BED_TRAMMING //ORIGINAL: //#define LCD_BED_TRAMMING
+//#define LCD_BED_TRAMMING
 
 #if ENABLED(LCD_BED_TRAMMING)
   #define BED_TRAMMING_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
   #define BED_TRAMMING_HEIGHT      0.0        // (mm) Z height of nozzle at tramming points
   #define BED_TRAMMING_Z_HOP       4.0        // (mm) Z raise between tramming points
-  #define BED_TRAMMING_INCLUDE_CENTER //ORIGINAL:   //#define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner
+  //#define BED_TRAMMING_INCLUDE_CENTER       // Move to the center after the last corner
   //#define BED_TRAMMING_USE_PROBE
   #if ENABLED(BED_TRAMMING_USE_PROBE)
     #define BED_TRAMMING_PROBE_TOLERANCE 0.1  // (mm)
@@ -2373,7 +2424,7 @@
  * - Allows Z homing only when XY positions are known and trusted.
  * - If stepper drivers sleep, XY homing may be required again before Z homing.
  */
-#define Z_SAFE_HOMING //ORIGINAL: //#define Z_SAFE_HOMING
+//#define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
   #define Z_SAFE_HOMING_X_POINT X_CENTER  // (mm) X point for Z homing
@@ -2496,7 +2547,7 @@
 //
 //#define TEMPERATURE_UNITS_SUPPORT
 
-// @section temperature
+// @section temperature presets
 
 //
 // Preheat Constants - Up to 10 are supported without changes
@@ -2526,7 +2577,7 @@
  *    P1  Raise the nozzle always to Z-park height.
  *    P2  Raise the nozzle by Z-park amount, limited to Z_MAX_POS.
  */
-#define NOZZLE_PARK_FEATURE //ORIGINAL: //#define NOZZLE_PARK_FEATURE
+//#define NOZZLE_PARK_FEATURE
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z_raise }
@@ -3127,7 +3178,7 @@
 
 //
 // FYSETC variant of the MINI12864 graphic controller with SD support
-// https://wiki.fysetc.com/Mini12864_Panel/
+// https://wiki.fysetc.com/docs/Mini12864Panel
 //
 //#define FYSETC_MINI_12864_X_X    // Type C/D/E/F. No tunable RGB Backlight by default
 //#define FYSETC_MINI_12864_1_2    // Type C/D/E/F. Simple RGB Backlight (always on)
@@ -3287,13 +3338,16 @@
  *  - Download https://github.com/CrealityOfficial/Ender-3S1/archive/3S1_Plus_Screen.zip
  *  - Copy the downloaded DWIN_SET folder to the SD card.
  *
+ * CREALITY_TOUCH
+ *  - CR-6 OEM touch screen. A DWIN display with touch.
+ *
  * Flash display with DGUS Displays for Marlin:
  *  - Format the SD card to FAT32 with an allocation size of 4kb.
  *  - Download files as specified for your type of display.
  *  - Plug the microSD card into the back of the display.
  *  - Boot the display and wait for the update to complete.
  *
- * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO' ]
+ * :[ 'ORIGIN', 'FYSETC', 'HYPRECY', 'MKS', 'RELOADED', 'IA_CREALITY', 'E3S1PRO', 'CREALITY_TOUCH' ]
  */
 //#define DGUS_LCD_UI ORIGIN
 #if DGUS_UI_IS(MKS)
@@ -3341,6 +3395,12 @@
 // 320x240 Nextion 2.8" serial TFT Resistive Touch Screen NX3224T028
 //
 //#define NEXTION_TFT
+
+//
+// PanelDue touch controller by Escher3D
+// https://escher3d.com/pages/order/products/product2.php
+//
+//#define PANELDUE
 
 //
 // Third-party or vendor-customized controller interfaces.
@@ -3480,6 +3540,7 @@
    * NOTOSANS  - Default font with anti-aliasing. Supports Latin Extended and non-Latin characters.
    * UNIFONT   - Lightweight font, no anti-aliasing. Supports Latin Extended and non-Latin characters.
    * HELVETICA - Lightweight font, no anti-aliasing. Supports Basic Latin (0x0020-0x007F) and Latin-1 Supplement (0x0080-0x00FF) characters only.
+   * :['NOTOSANS', 'UNIFONT', 'HELVETICA']
    */
   #define TFT_FONT  NOTOSANS
 
@@ -3489,6 +3550,7 @@
    * BLUE_MARLIN  - Default theme with 'midnight blue' background
    * BLACK_MARLIN - Theme with 'black' background
    * ANET_BLACK   - Theme used for Anet ET4/5
+   * :['BLUE_MARLIN', 'BLACK_MARLIN', 'ANET_BLACK']
    */
   #define TFT_THEME BLACK_MARLIN
 
@@ -3525,6 +3587,11 @@
 //#define DWIN_CREALITY_LCD_JYERSUI   // Jyers UI by Jacob Myers
 //#define DWIN_MARLINUI_PORTRAIT      // MarlinUI (portrait orientation)
 //#define DWIN_MARLINUI_LANDSCAPE     // MarlinUI (landscape orientation)
+
+#if ENABLED(DWIN_CREALITY_LCD)
+  //#define USE_STRING_HEADINGS       // Use string headings for Creality UI instead of images
+  //#define USE_STRING_TITLES         // Use string titles for Creality UI instead of images
+#endif
 
 //
 // Touch Screen Settings
