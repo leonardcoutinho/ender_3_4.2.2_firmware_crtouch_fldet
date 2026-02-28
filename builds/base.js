@@ -10,7 +10,7 @@ module.exports = {
             //standard leveling menu helper
             "LCD_BED_TRAMMING",
             "BED_TRAMMING_INCLUDE_CENTER",
-            ["X_BED_SIZE, 230],
+            ["X_BED_SIZE", 230],
             ["Y_MIN_POS", -9]
         ]
     },
