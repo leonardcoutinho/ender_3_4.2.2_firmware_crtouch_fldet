@@ -12,7 +12,7 @@ module.exports = {
             "BED_TRAMMING_INCLUDE_CENTER",
             ["X_BED_SIZE", 230],
             ["Y_BED_SIZE", 230],
-            ["Y_MIN_POS", 5]
+            ["Y_MIN_POS", 0]
         ]
     },
     configuration_adv: {
