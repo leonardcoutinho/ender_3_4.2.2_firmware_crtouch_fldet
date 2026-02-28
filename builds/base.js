@@ -6,11 +6,12 @@ module.exports = {
     },
     configuration: {
         enable: [
-            ["STRING_CONFIG_H_AUTHOR", "(Dust, valerionew, Ender-3, zisismaras)"],
+            ["STRING_CONFIG_H_AUTHOR", "(Dust, valerionew, Ender-3, zisismaras, leonardcoutinho)"],
             //standard leveling menu helper
             "LCD_BED_TRAMMING",
             "BED_TRAMMING_INCLUDE_CENTER",
-            ["Y_MIN_POS", -9],
+            ["X_BED_SIZE, 230],
+            ["Y_MIN_POS", -9]
         ]
     },
     configuration_adv: {
